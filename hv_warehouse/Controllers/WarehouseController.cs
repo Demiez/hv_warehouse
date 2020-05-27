@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using hv_warehouse.Models;
+using hv_warehouse.OldModels;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 

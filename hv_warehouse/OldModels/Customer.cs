@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace hv_warehouse.Models
+namespace hv_warehouse.OldModels
 {
     public class Customer
     {

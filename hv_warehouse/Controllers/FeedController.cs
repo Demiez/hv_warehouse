@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using hv_warehouse.Models;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using hv_warehouse.OldModels;
 
 namespace hv_warehouse.Controllers
 {
