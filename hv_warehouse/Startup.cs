@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using hv_warehouse.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace hv_warehouse
 {
@@ -23,6 +25,11 @@ namespace hv_warehouse
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionString = Configuration.GetConnectionString("WarehouseDB");
+            services.AddDbContext<warehouse_dbContext>(
+                options => options.UseNpgsql(connectionString)
+                );
+
             services.AddMvc();
             services.AddSwaggerGen(c =>
             {

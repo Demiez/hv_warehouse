@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using hv_warehouse.OldModels;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
+using hv_warehouse.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace hv_warehouse.Controllers
 {
@@ -14,15 +10,38 @@ namespace hv_warehouse.Controllers
     [ApiController]
     public class WarehouseController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly warehouse_dbContext _context;
 
-        public WarehouseController(IConfiguration configuration)
+        public WarehouseController(warehouse_dbContext context)
         {
-            _configuration = configuration;
+            _context = context;
         }
 
-        // GET: api/Warehouse
-        [HttpGet]
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllWarehouses()
+        {
+            string sql = "SELECT * FROM warehouses";
+
+            //string sql1 = "SELECT w.warehouse_id, p.part_name, w.part_qty, w.warehouse_address, w.warehouse_location FROM warehouses w JOIN parts p ON w.part_id = p.part_id;";
+
+            var warehouseList = await _context.Warehouses.FromSqlRaw(sql).ToListAsync();
+            return Ok(warehouseList);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWarehouse(string id)
+        {
+            string sql = "SELECT * FROM warehouses WHERE warehouse_id = {0}";
+            var warehouse = await _context.Warehouses.FromSqlRaw(sql, id).FirstOrDefaultAsync();
+            if (warehouse == null)
+            {
+                return NotFound();
+            }
+            return Ok(warehouse);
+        }
+
+
+        /*[HttpGet("old")]
         public async Task<IActionResult> GetAsync()
         {
             List<Warehouse> warehouseList = new List<Warehouse>();
@@ -46,31 +65,6 @@ namespace hv_warehouse.Controllers
                     warehouseList.Add(warehouse);
                 }
             return Ok(warehouseList);
-        }
-
-        // GET: api/Warehouse/5
-        [HttpGet("{id}")]
-        public string Get(string id)
-        {
-            return "value";
-        }
-
-        // POST: api/Warehouse
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT: api/Warehouse/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        }*/
     }
 }
