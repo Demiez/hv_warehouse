@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using hv_warehouse.Models;
 using System.Linq;
+using NpgsqlTypes;
 
 namespace hv_warehouse.Controllers
 {
@@ -49,8 +50,8 @@ namespace hv_warehouse.Controllers
             [FromQuery] int customerId
             )
         {
-            string sqlDate = shipmentDate.ToString("yyyy-MM-dd HH:mm:ss.fff");
-            var result = await _context.Database.ExecuteSqlInterpolatedAsync($"CALL shipment_insert({partId}, {shipmentQty}, {sqlDate}, {customerId})");
+            string sqlDate = shipmentDate.ToString("yyyy-MM-dd");
+            var result = await _context.Database.ExecuteSqlInterpolatedAsync($"CALL shipment_insert({partId}, {sqlDate}, {shipmentQty}, {customerId})");
             if (result == -1)
             {
                 return Ok("Added successfully");
@@ -70,7 +71,7 @@ namespace hv_warehouse.Controllers
                     )
         {
             string sql = "SELECT * FROM shipments WHERE shipment_id = {0}";
-            string sqlDate = shipmentDate.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            string sqlDate = shipmentDate.ToString("yyyy-MM-dd");
 
             var shipment = await _context.Shipments.FindAsync(id);
             if (shipment == null || shipment.ShipmentQty == shipmentQty)
@@ -83,7 +84,8 @@ namespace hv_warehouse.Controllers
                 if (query1 == -1)
                 {
                     await _context.Database.ExecuteSqlInterpolatedAsync($"CALL warehouse_after_shipment_update({partId}, {-number})");
-                    var result1 = await _context.Shipments.FromSqlRaw(sql, id).FirstOrDefaultAsync();
+                    _context.Entry(shipment).Reload();
+                    var result1 = await _context.Shipments.FromSqlRaw(sql, id).FirstAsync();
                     return Ok(result1);
                 }
                 else
@@ -99,6 +101,7 @@ namespace hv_warehouse.Controllers
                 return NotFound();
             }
             await _context.Database.ExecuteSqlInterpolatedAsync($"CALL warehouse_after_shipment_update({partId}, {partNumber})");
+            _context.Entry(shipment).Reload();
             var result2 = await _context.Shipments.FromSqlRaw(sql, id).FirstOrDefaultAsync();
             return Ok(result2);
         }

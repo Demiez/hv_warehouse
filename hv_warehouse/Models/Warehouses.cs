@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Text.Json.Serialization;
 
 namespace hv_warehouse.Models
 {
@@ -11,6 +10,7 @@ namespace hv_warehouse.Models
         public string WarehouseAddress { get; set; }
         public string WarehouseLocation { get; set; }
 
+        [JsonIgnore]
         public virtual Parts Part { get; set; }
     }
 }
