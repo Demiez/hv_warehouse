@@ -102,7 +102,7 @@ namespace hv_warehouse.Controllers
             }
             await _context.Database.ExecuteSqlInterpolatedAsync($"CALL warehouse_after_shipment_update({partId}, {partNumber})");
             _context.Entry(shipment).Reload();
-            var result2 = await _context.Shipments.FromSqlRaw(sql, id).FirstOrDefaultAsync();
+            var result2 = await _context.Shipments.FromSqlRaw(sql, id).FirstAsync();
             return Ok(result2);
         }
 
