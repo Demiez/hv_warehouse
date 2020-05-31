@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace hv_warehouse.Models
 {
@@ -27,6 +29,20 @@ namespace hv_warehouse.Models
             {
                 optionsBuilder.UseNpgsql("Host=localhost;Database=warehouse_db;Username=postgres;Password=1");
             }
+            optionsBuilder
+                .UseLoggerFactory(GetLoggerFactory())
+                .EnableSensitiveDataLogging();
+        }
+
+        private ILoggerFactory GetLoggerFactory()
+        {
+            IServiceCollection serviceCollection = new ServiceCollection();
+            serviceCollection.AddLogging(builder =>
+                   builder.AddConsole()
+                          .AddFilter(DbLoggerCategory.Database.Command.Name,
+                                     LogLevel.Information));
+            return serviceCollection.BuildServiceProvider()
+                    .GetService<ILoggerFactory>();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
