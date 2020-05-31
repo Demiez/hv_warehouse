@@ -136,5 +136,36 @@ namespace hv_warehouse.Controllers
                 }
             return Ok(monthlyReport);
         }
+
+        [HttpGet("production_modification")]
+        public async Task<IActionResult> GetPlannedProduction()
+        {
+            List<ProductionModificationReport> prodModification = new List<ProductionModificationReport>();
+            var connectionString = _configuration.GetConnectionString("WarehouseDB");
+
+            await using var conn = new NpgsqlConnection(connectionString);
+            await conn.OpenAsync();
+
+            /*
+            string sql = $"SELECT DISTINCT p.part_id, p.part_name, (SELECT SUM(s.shipment_qty) FROM shipments s WHERE s.part_id = p.part_id) AS total_shipments,(SELECT CAST(AVG(s.shipment_qty) AS numeric(10, 2)) FROM shipments s WHERE s.part_id = p.part_id) AS average_shipments,(SELECT CAST(AVG(s.shipment_qty) AS numeric(10, 2)) FROM shipments s WHERE s.part_id = p.part_id) *6 AS average_required, (w.part_qty - (SELECT CAST(AVG(s.shipment_qty) AS numeric(10, 2)) FROM shipments s WHERE s.part_id = p.part_id) *6) *-1 AS modify_production FROM parts p LEFT JOIN shipments s ON p.part_id = s.part_id JOIN warehouses w ON p.part_id = w.part_id WHERE s.shipment_date > date_trunc('day', NOW() - interval '6 month');";
+            */
+            string sql = "SELECT * FROM production_modification";
+
+            await using (var cmd = new NpgsqlCommand(sql, conn))
+            await using (var reader = await cmd.ExecuteReaderAsync())
+                while (await reader.ReadAsync())
+                {
+                    var info = new ProductionModificationReport();
+
+                    info.PartId = reader["part_id"] is DBNull ? "N/A" : reader["part_id"].ToString();
+                    info.PartName = reader["part_name"] is DBNull ? "N/A" : reader["part_name"].ToString();
+                    info.TotalShipments = reader["total_shipments"] is DBNull ? 0 : Convert.ToInt32(reader["total_shipments"]);
+                    info.AverageShipments = reader["average_shipments"] is DBNull ? 0 : float.Parse(reader["average_shipments"].ToString());
+                    info.AverageRequired = reader["average_required"] is DBNull ? 0 : float.Parse(reader["average_required"].ToString());
+                    info.ModifyProduction = float.Parse(reader["modify_production"].ToString());
+                    prodModification.Add(info);
+                }
+            return Ok(prodModification);
+        }
     }
 }
