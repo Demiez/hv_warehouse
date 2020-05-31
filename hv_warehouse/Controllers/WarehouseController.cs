@@ -37,5 +37,18 @@ namespace hv_warehouse.Controllers
             }
             return Ok(warehouse);
         }
+
+        [HttpGet("sql")]
+        public async Task<IActionResult> GetSQLWarehouse(
+            [FromQuery] string SQL
+            )
+        {
+            var sqlResult = await _context.Warehouses.FromSqlRaw(SQL).ToListAsync();
+            if (sqlResult == null)
+            {
+                return NotFound();
+            }
+            return Ok(sqlResult);
+        }
     }
 }

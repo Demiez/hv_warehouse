@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace hv_warehouse.Models
 {
@@ -18,8 +19,11 @@ namespace hv_warehouse.Models
         public decimal? PartPrice { get; set; }
         public string PartDesc { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<Feeds> Feeds { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Shipments> Shipments { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Warehouses> Warehouses { get; set; }
     }
 }

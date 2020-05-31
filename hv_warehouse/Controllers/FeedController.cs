@@ -99,6 +99,19 @@ namespace hv_warehouse.Controllers
             return Ok(feed);
         }
 
+        [HttpGet("sql")]
+        public async Task<IActionResult> GetSQLFeed(
+            [FromQuery] string SQL
+            )
+        {
+            var sqlResult = await _context.Feeds.FromSqlRaw(SQL).ToListAsync();
+            if (sqlResult == null)
+            {
+                return NotFound();
+            }
+            return Ok(sqlResult);
+        }
+
         [HttpPost("new")]
         public async Task<IActionResult> AddFeed(
             [FromQuery] string partId,

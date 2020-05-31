@@ -103,6 +103,19 @@ namespace hv_warehouse.Controllers
             return Ok(shipment);
         }
 
+        [HttpGet("sql")]
+        public async Task<IActionResult> GetSQLShipment(
+            [FromQuery] string SQL
+            )
+        {
+            var sqlResult = await _context.Shipments.FromSqlRaw(SQL).ToListAsync();
+            if (sqlResult == null)
+            {
+                return NotFound();
+            }
+            return Ok(sqlResult);
+        }
+
         [HttpPost("new")]
         public async Task<IActionResult> AddShipment(
             [FromQuery] string partId,
