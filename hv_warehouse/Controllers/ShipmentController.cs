@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using hv_warehouse.Models;
 using System.Linq;
 using NpgsqlTypes;
+using System.Collections.Generic;
 
 namespace hv_warehouse.Controllers
 {
@@ -20,12 +21,72 @@ namespace hv_warehouse.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<IActionResult> GetAllShipments()
+        public async Task<IActionResult> GetAllShipments(
+            [FromQuery] string sortField,
+            [FromQuery] string sortOrder,
+            [FromQuery] string filterString,
+            [FromQuery] string searchString
+            )
         {
             string sql = "SELECT * FROM shipments";
+            string sorting = $"{sortField}-{sortOrder}".ToLower();
+            List<Shipments> shipmentList = new List<Shipments>();
+            switch (sorting)
+            {
+                case "shipmentid-desc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderByDescending(shipment => shipment.ShipmentId).ToListAsync();
+                    break;
+                case "partid-asc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderBy(shipment => shipment.PartId).ToListAsync();
+                    break;
+                case "partid-desc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderByDescending(shipment => shipment.PartId).ToListAsync();
+                    break;
+                case "shipmentdate-asc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderBy(shipment => shipment.ShipmentDate).ToListAsync();
+                    break;
+                case "shipmentdate-desc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderByDescending(shipment => shipment.ShipmentDate).ToListAsync();
+                    break;
+                case "shipmentqty-asc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderBy(shipment => shipment.ShipmentQty).ToListAsync();
+                    break;
+                case "shipmentqty-desc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderByDescending(shipment => shipment.ShipmentQty).ToListAsync();
+                    break;
+                case "customerid-asc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderBy(shipment => shipment.CustomerId).ToListAsync();
+                    break;
+                case "customerid-desc":
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderByDescending(shipment => shipment.CustomerId).ToListAsync();
+                    break;
+                default:
+                    shipmentList = await _context.Shipments.FromSqlRaw(sql).OrderBy(shipment => shipment.ShipmentId).ToListAsync();
+                    break;
+            }
 
-            var shipmentList = await _context.Shipments.FromSqlRaw(sql)
-                .ToListAsync();
+            if (!String.IsNullOrEmpty(filterString))
+            {
+                var number = Int32.Parse(filterString.Substring(1));
+                var op = filterString.Substring(0, 1);
+                if (op == "<")
+                {
+                    shipmentList = shipmentList.Where(shipment => shipment.ShipmentQty < number).ToList();
+                }
+                else if (op == ">")
+                {
+                    shipmentList = shipmentList.Where(shipment => shipment.ShipmentQty > number).ToList();
+                }
+                else
+                {
+                    shipmentList = shipmentList.Where(shipment => shipment.ShipmentQty == number).ToList();
+                }
+            }
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                shipmentList = shipmentList.Where(shipment => shipment.PartId.Contains(searchString.ToUpper())).ToList();
+            }
 
             return Ok(shipmentList);
         }
