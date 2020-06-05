@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
 using hv_warehouse.Models;
-using System.Data.SqlClient; // to eneable SqlParameter
-using System.Linq;
 using Npgsql;
 
 namespace hv_warehouse.Controllers
