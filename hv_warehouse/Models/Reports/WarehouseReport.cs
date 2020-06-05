@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace hv_warehouse.Models
+﻿namespace hv_warehouse.Models
 {
     public class WarehouseReport
     {

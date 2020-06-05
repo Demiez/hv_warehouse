@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using hv_warehouse.Models;
 using Microsoft.EntityFrameworkCore;
 
