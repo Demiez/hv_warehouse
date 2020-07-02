@@ -1,4 +1,4 @@
-# High Voltage Warehouse API
+# High Voltage Warehouse API _ DB first approach
 
 ### There is a company of high voltage parts with production at the enterprise level. Feeds of parts, which come to the warehouse contain: high voltage part name, code, date feed, quantity of parts (for simplification). There is also an information about the shipment of hv_parts from the warehouse to customers: identity code and name, date of shipment, quantity of parts, customer. Separate info is also stored about each customer with mandatiry info about address and contact phone number.
 
